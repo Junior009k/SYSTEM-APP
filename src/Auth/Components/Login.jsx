@@ -76,6 +76,7 @@ const Login = () => {
         <p className="forgot-password">
           <a href="/reset-password">¿Olvidaste tu contraseña?</a>
         </p>
+        No tienes cuenta? <a href="/Register">Registra</a>
       </div>
     </div>
   );
