@@ -1,7 +1,11 @@
 // src/components/Register.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../Supabase/Supabase'; // Asegúrate de que la ruta sea corr
+import Dashboard from './Dashboard';
 const Register = () => {
+  const [session, setSession] = useState(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authMessage, setAuthMessage] = useState('');
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,6 +42,30 @@ const Register = () => {
     }
   };
 
+  useEffect(() => {
+          const getSession = async () => {
+              const { data: { session } } = await supabase.auth.getSession();
+              setSession(session);
+              setAuthLoading(false);
+          };
+  
+          getSession();
+  
+          const { data: { subscription } } = supabase.auth.onAuthStateChange(
+              (_event, session) => {
+                  setSession(session);
+                  setAuthLoading(false);
+              }
+          );
+  
+          return () => subscription.unsubscribe();
+      }, []);
+
+  if (session) {
+          return (
+              <Dashboard/>
+          );
+      }
   return (
     <div className="login-container"> {/* <= Mismo contenedor de estética */}
       <div className="login-card"> {/* <= Misma tarjeta */}

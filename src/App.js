@@ -7,6 +7,8 @@ import Clientes from './Auth/Components/Client';
 import { supabase } from './Auth/Supabase/Supabase';
 import Dashboard from './Auth/Components/Dashboard';
 import NotificationSetting from './Auth/Components/NotificactionSetting';
+import Caducidades from './Auth/Components/Caducidades';
+import ClientMigration from './Auth/Components/ClientMigration';
 function App() {
   const [session, setSession] = useState(null);
 
@@ -36,8 +38,10 @@ function App() {
         <Route path="/" element={ <Login/> } />
         <Route path="/Register" element={ <Register/> } />
         <Route path="/Clientes" element={ <Clientes/> } />
-      <Route path="/Reportes" element={ <Dashboard/> } />
-       <Route path="/Notificacion" element={ <NotificationSetting/> } />
+        <Route path="/Reportes" element={ <Dashboard/> } />
+        <Route path="/Notificacion" element={ <NotificationSetting/> } />
+        <Route path="/Caducidades" element={ <Caducidades/> } />
+        <Route path="/ClientesMigration" element={ <ClientMigration/> } />
         </Routes>
     </div>
       
