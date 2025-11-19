@@ -69,3 +69,19 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 "# SYSTEM-APP" 
+
+<div className="container" style={{ padding: '50px 0 100px 0' }}>
+            {!session ? (
+                <Login/>
+            ) : (
+                <div className="clientes-area">
+                    <div style={{ textAlign: 'right', marginBottom: '20px' }}>
+                        <p>Logeado como: <strong>{session.user.email}</strong></p>
+                        <button onClick={handleLogout} className="button block">
+                            Cerrar Sesión
+                        </button>
+                    </div>
+                    <Clientes session={session} /> {/* Mostrar CRUD de Clientes */}
+                </div>
+            )}
+        </div> 
