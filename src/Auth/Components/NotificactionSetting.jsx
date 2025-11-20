@@ -487,15 +487,6 @@ const NotificationSetting = () => {
             {/* INCLUSIÓN DE ESTILOS */}
             <style dangerouslySetInnerHTML={{ __html: NOTIFICATION_STYLES }} />
 
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '10px 0' }}>
-                <h1 style={{ margin: 0, fontSize: '1.8rem' }}>Panel de Configuración de Notificaciones</h1>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <span style={{ fontSize: '0.9rem', color: '#495057' }}>Sesión: <strong>{session.user.email}</strong></span>
-                    <button onClick={handleLogout} className="btn-secondary" style={{ flexGrow: 0, width: 'auto' }}>
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </header>
 
             <div id="crud-container">
                 {/* Panel de Formulario CRUD */}

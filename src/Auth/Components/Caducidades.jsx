@@ -319,12 +319,6 @@ const Caducidades = () => {
             {/* INCLUSIÓN DE ESTILOS */}
             <style dangerouslySetInnerHTML={{ __html: CADUCIDADES_STYLES }} />
 
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1200px', margin: '0 auto 20px auto', padding: '10px 0' }}>
-                <h1 style={{ margin: 0 }}>Gestión de Clientes (Solo Fechas)</h1>
-                <button onClick={handleLogout} className="logout-button">
-                    Cerrar Sesión ({session.user.email})
-                </button>
-            </header>
 
             <div id="crud-container">
                 {/* Panel de Formulario de Actualización */}

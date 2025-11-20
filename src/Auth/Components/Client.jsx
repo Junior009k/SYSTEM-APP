@@ -304,18 +304,6 @@ const Clientes = () => {
             {/* INCLUSIÓN DE ESTILOS */}
             <style dangerouslySetInnerHTML={{ __html: getStyles() }} />
 
-            <div style={{ textAlign: 'right', marginBottom: '20px' }}>
-                <p>Sesión activa: <strong>{session.user.email}</strong></p>
-                <button 
-                    onClick={handleLogout} 
-                    style={{ 
-                        backgroundColor: '#e53e3e', color: 'white', padding: '10px 15px', 
-                        border: 'none', borderRadius: '5px', cursor: 'pointer' 
-                    }}
-                >
-                    Cerrar Sesión
-                </button>
-            </div>
             
             <h1>Gestión de Clientes</h1>
 

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../Supabase/Supabase'; 
-import Chart from 'chart.js/auto'; // Importación necesaria para Chart.js en React
+import Chart from 'chart.js/auto'; 
 import Login from './Login';
-// --- CSS del HTML original (Incluido en el componente para fidelidad visual) ---
+// Importa el Navigate si aún no lo has hecho, aunque solo se usa Login aquí.
+
+// --- CSS del HTML original (SOLUCIÓN APLICADA: Eliminado el selector 'body') ---
 const DASHBOARD_STYLES = `
     /* Variables y Paleta de Colores (Moderno y Corporativo) */
     :root {
@@ -27,14 +29,14 @@ const DASHBOARD_STYLES = `
         --order-listo: #10B981;     
     }
 
-    /* Base y Tipografía */
-    body {
+    /* Base y Tipografía (***FIX: Se ha ELIMINADO el selector 'body' para evitar el conflicto de layout.***) */
+    .dashboard-wrapper-style { /* Clase genérica para aplicar fuentes si es necesario */
         font-family: 'Inter', sans-serif;
-        background-color: var(--color-primary-bg);
-        min-height: 100vh;
         color: var(--color-text-dark);
-        margin: 0;
+        min-height: 100%;
+        width: 100%;
     }
+
 
     .container {
         max-width: 1380px;
@@ -228,7 +230,6 @@ const DASHBOARD_STYLES = `
     .client-table {
         width: 100%;
         border-collapse: collapse;
-        /* min-width: 900px; */ /* Desactivado en React para mejor responsive */
         table-layout: fixed;
     }
     
@@ -405,7 +406,7 @@ const Dashboard = () => {
 
     // --- Lógica de Procesamiento y Carga de Datos ---
 
-    // Función pura para procesar los datos brutos (igual que en el JS original)
+    // Función pura para procesar los datos brutos
     const processClientData = useCallback((clients) => {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -463,7 +464,6 @@ const Dashboard = () => {
     const loadClientData = useCallback(async () => {
         setDataLoading(true);
 
-        // Asegúrate de que solo los usuarios autenticados puedan leer (si RLS está habilitado)
         const { data, error } = await supabase
             .from('clientes')
             .select('id, nombre_de_cliente, fecha_de_caducidad, nueva_fecha_de_caducidad, soporte, prioridad, state');
@@ -751,13 +751,15 @@ const Dashboard = () => {
     if (authLoading) {
         return (
             <div className="container" style={{ padding: '50px 0', textAlign: 'center' }}>
-                <style dangerouslySetInnerHTML={{ __html: DASHBOARD_STYLES }} />
+                {/* Aún inyectamos los estilos aquí para que 'container' y 'h2' tengan formato */}
+                <style dangerouslySetInnerHTML={{ __html: DASHBOARD_STYLES }} /> 
                 <h2>Cargando autenticación...</h2>
             </div>
         );
     }
 
    if (!session) {
+        // Redirige al Login/Home, manejado por el Navigate en App.js
         return (
             <Login/>
         );
@@ -767,22 +769,10 @@ const Dashboard = () => {
     // --- Componente de Dashboard Principal (Logged-in UI) ---
 
     return (
-        <div>
-            {/* INCLUSIÓN DE ESTILOS */}
+        <div className="dashboard-wrapper-style">
+            {/* INCLUSIÓN DE ESTILOS - Ahora solo inyecta selectores específicos */}
             <style dangerouslySetInnerHTML={{ __html: DASHBOARD_STYLES }} />
 
-            <header className="header">
-                <div className="header-content">
-                    <h1>Dashboard de Caducidad y Planificación</h1>
-                </div>
-                <div className="user-info">
-                    <span>ID de Usuario:</span>
-                    <span className="user-id-display" style={{ fontWeight: 'bold' }}>{session.user.email}</span>
-                    <button onClick={handleLogout} className="logout-button">
-                        Cerrar Sesión
-                    </button>
-                </div>
-            </header>
 
             <div className="container">
 
