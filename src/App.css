@@ -139,6 +139,42 @@
   text-decoration: underline;
 }
 
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    th {
+        background-color: #edf2f7;
+    }
+    tr:hover {
+        background-color: #f7fafc;
+    }
+    .actions button {
+        margin-right: 5px;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .edit-btn {
+        background-color: #3182ce;
+        color: white;
+    }
+    .delete-btn { /* No se usa en este módulo pero se mantiene por si acaso */
+        background-color: #e53e3e; 
+        color: white;
+    }
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .login-card {

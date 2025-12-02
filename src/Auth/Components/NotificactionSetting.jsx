@@ -6,34 +6,7 @@ import Login from './Login';
 const TABLE_NAME = 'clientes';
 
 // --- CSS del HTML original (Incluido para fidelidad visual) ---
-const NOTIFICATION_STYLES = `
-    /* Estilos Base y Layout */
-    body {
-        font-family: 'Inter', sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f8f9fa; 
-        color: #343a40;
-    }
-    h1, h2 {
-        color: #007bff; 
-        font-weight: 700;
-    }
-    #crud-container {
-        display: grid;
-        grid-template-columns: 350px 1fr; 
-        gap: 30px;
-        max-width: 1400px; 
-        margin: 0 auto;
-    }
-    @media (max-width: 1024px) {
-        #crud-container {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-    }
-
-    /* Estilo de Formulario y Contenedores */
+const NOTIFICATION_STYLES = ` 
     .card {
         background: #fff;
         padding: 25px;
@@ -165,27 +138,7 @@ const NOTIFICATION_STYLES = `
         color: #dc3545;
     }
     
-    /* Estilos del formulario de autenticación */
-    #auth-form {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); 
-        background: #fff;
-    }
-    #auth-form input[type="email"] {
-        padding: 10px;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        font-size: 1rem;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    #auth-form button {
-        width: 100%;
-        margin-top: 15px;
-    }
+
 `;
 
 // --- Estado Inicial del Formulario ---
@@ -262,26 +215,6 @@ const NotificationSetting = () => {
 
         return () => subscription.unsubscribe();
     }, []);
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setAuthLoading(true);
-        setAuthMessage('');
-        const { error } = await supabase.auth.signInWithOtp({ email: authEmail });
-
-        if (error) {
-            setAuthMessage(error.error_description || error.message);
-        } else {
-            setAuthMessage('¡Revisa tu correo electrónico para el enlace mágico!');
-        }
-        setAuthLoading(false);
-    };
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-    };
-
-    // --- Lógica CRUD y Configuración ---
 
     /**
      * Carga todos los clientes y su configuración de mail.
@@ -488,7 +421,7 @@ const NotificationSetting = () => {
             <style dangerouslySetInnerHTML={{ __html: NOTIFICATION_STYLES }} />
 
 
-            <div id="crud-container">
+            <div id="notification-container">
                 {/* Panel de Formulario CRUD */}
                 <div className="card" id="form-panel">
                     <h2>

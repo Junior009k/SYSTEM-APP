@@ -1,33 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../Supabase/Supabase'; 
+import {selectClient, updateClient} from '../Supabase/Service'; 
 import Login from './Login';
 
-const TABLE_NAME = 'clientes';
-
-// --- CSS del HTML original (Incluido para fidelidad visual) ---
 const CADUCIDADES_STYLES = `
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f4f7f6;
-        color: #333;
-    }
-    h1, h2 {
-        color: #1a202c;
-    }
-    #crud-container {
-        display: grid;
-        grid-template-columns: 300px 1fr;
-        gap: 30px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    @media (max-width: 1024px) {
-        #crud-container {
-            grid-template-columns: 1fr;
-        }
-    }
     #clientForm {
         background: #fff;
         padding: 20px;
@@ -75,77 +51,7 @@ const CADUCIDADES_STYLES = `
         color: #495057;
     }
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    th, td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-    }
-    th {
-        background-color: #edf2f7;
-    }
-    tr:hover {
-        background-color: #f7fafc;
-    }
-    .actions button {
-        margin-right: 5px;
-        padding: 5px 10px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .edit-btn {
-        background-color: #3182ce;
-        color: white;
-    }
-    .delete-btn { /* No se usa en este módulo pero se mantiene por si acaso */
-        background-color: #e53e3e; 
-        color: white;
-    }
-
-    /* Estilos de Auth UI */
-    #auth-form {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1); 
-        background: #fff;
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    #auth-form input {
-        padding: 10px;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        font-size: 1rem;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    #auth-form button {
-        width: 100%;
-        margin-top: 15px;
-    }
-    .logout-button {
-        background-color: #e53e3e;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .logout-button:hover {
-        background-color: #c53030;
-    }
+   
 `;
 
 // --- Estado Inicial del Formulario ---
@@ -161,15 +67,9 @@ const Caducidades = () => {
     // --- Estado de Autenticación ---
     const [session, setSession] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
-    const [authEmail, setAuthEmail] = useState('');
-    const [authMessage, setAuthMessage] = useState('');
-
-    // --- Estado CRUD ---
     const [formData, setFormData] = useState(initialFormState);
     const [clients, setClients] = useState([]);
     const [crudLoading, setCrudLoading] = useState(true);
-
-    // --- Lógica de Autenticación ---
 
     useEffect(() => {
         const getSession = async () => {
@@ -195,34 +95,10 @@ const Caducidades = () => {
         return () => subscription.unsubscribe();
     }, []);
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setAuthLoading(true);
-        setAuthMessage('');
-        const { error } = await supabase.auth.signInWithOtp({ email: authEmail });
-
-        if (error) {
-            setAuthMessage(error.error_description || error.message);
-        } else {
-            setAuthMessage('¡Revisa tu correo electrónico para el enlace mágico!');
-        }
-        setAuthLoading(false);
-    };
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-    };
-
-
-    // --- Lógica CRUD y Promoción de Fechas ---
-
+    
     const loadClientes = useCallback(async () => {
         setCrudLoading(true);
-        const { data, error } = await supabase
-            .from(TABLE_NAME)
-            .select('id, nombre_de_cliente, fecha_de_caducidad, nueva_fecha_de_caducidad, soporte, prioridad')
-            .order('id', { ascending: true });
-
+        const { data, error } = await selectClient()
         if (error) {
             console.error('Error al cargar clientes:', error);
             setClients([]);
@@ -241,7 +117,6 @@ const Caducidades = () => {
             nombre_de_cliente: cliente.nombre_de_cliente || '',
             fecha_de_caducidad: cliente.fecha_de_caducidad || '',
             nueva_fecha_caducidad: cliente.nueva_fecha_de_caducidad || '', // Valor editable
-            // 🌟 GUARDAR EL VALOR DE LA FECHA PENDIENTE ANTES DE QUE EL USUARIO LO EDITE
             fechaPromocionable: cliente.nueva_fecha_de_caducidad || null, 
         });
         window.scrollTo(0, 0);
@@ -285,10 +160,7 @@ const Caducidades = () => {
             nueva_fecha_de_caducidad: nuevaFechaPendiente || null, 
         };
 
-        const { error } = await supabase
-            .from(TABLE_NAME)
-            .update(updateData) 
-            .eq('id', id);
+        const { error } = await updateClient(updateData)
 
         if (error) {
             console.error('Error actualizando cliente:', error);
@@ -320,7 +192,7 @@ const Caducidades = () => {
             <style dangerouslySetInnerHTML={{ __html: CADUCIDADES_STYLES }} />
 
 
-            <div id="crud-container">
+            <div id="update-container">
                 {/* Panel de Formulario de Actualización */}
                 <form id="clientForm" onSubmit={handleSubmit}>
                     <h2>Actualizar Fechas del Cliente</h2>

@@ -3,18 +3,8 @@ import { supabase } from '../Supabase/Supabase';
 import Login from './Login';
 
 
-// --- CSS del HTML original (adaptado para inclusión en el componente) ---
 const getStyles = () => `
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        background-color: #f4f7f6;
-        color: #333;
-    }
-    h1, h2 {
-        color: #1a202c;
-    }
+    
     #crud-container {
         display: grid;
         grid-template-columns: 300px 1fr;
@@ -65,40 +55,6 @@ const getStyles = () => `
     #clientForm button[type="button"]:hover {
         background-color: #718096;
     }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    th, td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid #eee;
-    }
-    th {
-        background-color: #edf2f7;
-    }
-    tr:hover {
-        background-color: #f7fafc;
-    }
-    .actions button {
-        margin-right: 5px;
-        padding: 5px 10px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    .edit-btn {
-        background-color: #3182ce;
-        color: white;
-    }
-    .delete-btn {
-        background-color: #e53e3e;
-        color: white;
-    }
 `;
 
 const initialFormState = {
@@ -127,11 +83,9 @@ const Clientes = () => {
     // --- Lógica de Autenticación ---
 
     useEffect(() => {
-        // Inicializar la sesión y escuchar cambios
         const getSession = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             setSession(session);
-            // Si ya está autenticado, cargar clientes
             if (session) {
                 loadClientes();
             } else {
@@ -154,28 +108,6 @@ const Clientes = () => {
 
         return () => subscription.unsubscribe();
     }, []);
-
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setAuthLoading(true);
-        setAuthMessage('');
-        const { error } = await supabase.auth.signInWithOtp({ email });
-
-        if (error) {
-            setAuthMessage(error.error_description || error.message);
-        } else {
-            setAuthMessage('¡Revisa tu correo electrónico para el enlace mágico!');
-        }
-        setAuthLoading(false);
-    };
-
-    const handleLogout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) console.error('Error al cerrar sesión:', error);
-    };
-
-    // --- Lógica CRUD ---
 
     /**
      * Mapeo de campos del formulario a campos de la DB
@@ -303,9 +235,6 @@ const Clientes = () => {
         <div>
             {/* INCLUSIÓN DE ESTILOS */}
             <style dangerouslySetInnerHTML={{ __html: getStyles() }} />
-
-            
-            <h1>Gestión de Clientes</h1>
 
             <div id="crud-container">
                 {/* Formulario de Clientes */}

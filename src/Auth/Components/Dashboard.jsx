@@ -29,7 +29,6 @@ const DASHBOARD_STYLES = `
         --order-listo: #10B981;     
     }
 
-    /* Base y Tipografía (***FIX: Se ha ELIMINADO el selector 'body' para evitar el conflicto de layout.***) */
     .dashboard-wrapper-style { /* Clase genérica para aplicar fuentes si es necesario */
         font-family: 'Inter', sans-serif;
         color: var(--color-text-dark);
@@ -349,9 +348,7 @@ const Dashboard = () => {
     const chartInstance = useRef(null);
     const [session, setSession] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
-    const [email, setEmail] = useState('');
-    const [authMessage, setAuthMessage] = useState('');
-
+   
     const [allClients, setAllClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
@@ -384,27 +381,6 @@ const Dashboard = () => {
 
         return () => subscription.unsubscribe();
     }, []);
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setAuthLoading(true);
-        setAuthMessage('');
-        const { error } = await supabase.auth.signInWithOtp({ email });
-
-        if (error) {
-            setAuthMessage(error.error_description || error.message);
-        } else {
-            setAuthMessage('¡Revisa tu correo electrónico para el enlace mágico!');
-        }
-        setAuthLoading(false);
-    };
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        setSession(null);
-    };
-
-    // --- Lógica de Procesamiento y Carga de Datos ---
 
     // Función pura para procesar los datos brutos
     const processClientData = useCallback((clients) => {
