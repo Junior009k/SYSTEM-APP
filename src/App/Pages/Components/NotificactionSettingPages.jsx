@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../Supabase/Supabase'; 
-import Chart from 'chart.js/auto'; // Importación necesaria para Chart.js en React
-import Login from './Login';
+import { supabase } from '../../Service/Database/Supabase'; 
+import Login from '../../Auth/Components/Login';
 
 const TABLE_NAME = 'clientes';
 
@@ -172,7 +171,7 @@ const getMailConfig = (mailData) => {
     return mailConfig || {};
 };
 
-const NotificationSetting = () => {
+const NotificationSettingPages = () => {
     // --- Estado de Autenticación ---
     const [session, setSession] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
@@ -633,4 +632,4 @@ const NotificationSetting = () => {
     );
 };
 
-export default NotificationSetting;
+export default NotificationSettingPages;

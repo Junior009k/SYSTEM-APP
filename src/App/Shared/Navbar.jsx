@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { supabase } from '../../Auth/Supabase/Supabase'; // Ajusta la ruta a tu archivo Supabase
+import { supabase } from '../Service/Database/Supabase'; // Ajusta la ruta a tu archivo Supabase
 
 // --- CSS DEL NAVBAR INYECTADO (Basado en la paleta de colores de Dashboard) ---
 const NAVBAR_STYLES = `

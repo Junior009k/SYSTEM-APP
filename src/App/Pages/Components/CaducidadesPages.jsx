@@ -1,57 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../Supabase/Supabase'; 
-import {selectClient, updateClient} from '../Supabase/Service'; 
-import Login from './Login';
+import { supabase } from '../../Service/Database/Supabase'; 
+import {selectClient, updateClient} from '../../Service/Components/Service' 
+import Login from '../../Auth/Components/Login';
 
 const CADUCIDADES_STYLES = `
-    #clientForm {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    #clientForm div {
-        display: flex;
-        flex-direction: column;
-    }
-    #clientForm label {
-        margin-bottom: 5px;
-        font-weight: 600;
-    }
-    #clientForm input, 
-    #clientForm button {
-        padding: 10px;
-        border-radius: 5px;
-        border: 1px solid #ddd;
-        font-size: 16px;
-    }
-    #clientForm button {
-        background-color: #2c5282;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    #clientForm button:hover {
-        background-color: #2a4365;
-    }
-    #clientForm button[type="button"] {
-        background-color: #a0aec0;
-    }
-    #clientForm button[type="button"]:hover {
-        background-color: #718096;
-    }
-
     /* Campos deshabilitados */
     #clientId:disabled, #nombreReadOnly:disabled, #fecha_caducidad:disabled {
         background-color: #e9ecef;
         color: #495057;
-    }
-
-   
+    }  
 `;
 
 // --- Estado Inicial del Formulario ---
@@ -63,7 +20,7 @@ const initialFormState = {
     fechaPromocionable: null, // 🌟 VALOR CLAVE: Valor que se promoverá al guardar
 };
 
-const Caducidades = () => {
+const CaducidadesPages = () => {
     // --- Estado de Autenticación ---
     const [session, setSession] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
@@ -282,4 +239,4 @@ const Caducidades = () => {
     );
 };
 
-export default Caducidades;
+export default CaducidadesPages;

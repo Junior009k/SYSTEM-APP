@@ -1,16 +1,17 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
-import { supabase } from './Auth/Supabase/Supabase';
+import { supabase } from './App/Service/Database/Supabase';
 
 // Componentes
-import Login from './Auth/Components/Login';
-import Register from './Auth/Components/Register';
-import Clientes from './Auth/Components/Client';
-import Dashboard from './Auth/Components/Dashboard';
-import NotificationSetting from './Auth/Components/NotificactionSetting';
-import Caducidades from './Auth/Components/Caducidades';
-import ClientMigration from './Auth/Components/ClientMigration';
+import Login from './App/Auth/Components/Login';
+import Register from './App/Auth/Components/Register';
+import ClientesPages from './App/Pages/Components/ClientPages';
+import DashboardPages from './App/Pages/Components/DashboardPages';
+import NotificationSettingPages from './App/Pages/Components/NotificactionSettingPages';
+import CaducidadesPages from './App/Pages/Components/CaducidadesPages';
+import ClientMigrationPages from './App/Pages/Components/ClientMigrationPages';
+import ProfilePages from './App/Pages/Components/ProfilePages';
 // *IMPORTANTE: Reemplazamos Sidebar por Navbar*
 import Navbar from './App/Shared/Navbar'; // Asegúrate que esta ruta es correcta
 
@@ -69,11 +70,12 @@ function App() {
             <Route path="/Register" element={!session ? <Register /> : <Navigate to="/Reportes" />} />
             
             {/* RUTAS PROTEGIDAS */}
-            <Route path="/Clientes" element={session ? <Clientes /> : <Navigate to="/" />} />
-            <Route path="/Reportes" element={session ? <Dashboard /> : <Navigate to="/" />} />
-            <Route path="/Notificacion" element={session ? <NotificationSetting /> : <Navigate to="/" />} />
-            <Route path="/Caducidades" element={session ? <Caducidades /> : <Navigate to="/" />} />
-            <Route path="/ClientesMigration" element={session ? <ClientMigration /> : <Navigate to="/" />} />
+            <Route path="/Clientes" element={session ? <ClientesPages /> : <Navigate to="/" />} />
+            <Route path="/Reportes" element={session ? <DashboardPages /> : <Navigate to="/" />} />
+            <Route path="/Notificacion" element={session ? <NotificationSettingPages /> : <Navigate to="/" />} />
+            <Route path="/Caducidades" element={session ? <CaducidadesPages /> : <Navigate to="/" />} />
+            <Route path="/ClientesMigration" element={session ? <ClientMigrationPages /> : <Navigate to="/" />} />
+             <Route path="/Profile" element={session ? <ProfilePages /> : <Navigate to="/" />} />
           </Routes>
         </div>
       </main>

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {insertClient} from '../Supabase/Service'; 
-import Login from './Login';
+import { supabase } from '../../Service/Database/Supabase'; 
+import {insertClient} from '../../Service/Components/Service'; 
+import Login from '../../Auth/Components/Login';
 
 
-const ClientMigration = () => {
+const ClientMigrationPages = () => {
     const [session, setSession] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
     const [uploadStatus, setUploadStatus] = useState('');
@@ -179,4 +180,4 @@ const ClientMigration = () => {
     );
 };
 
-export default ClientMigration;
+export default ClientMigrationPages;

@@ -1,4 +1,4 @@
-import { supabase } from '../Supabase/Supabase'; 
+import { supabase } from '../Database/Supabase'; 
 
 
 const TABLE_NAME = 'clientes';

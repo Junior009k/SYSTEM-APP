@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { supabase } from '../Supabase/Supabase'; 
+import { supabase } from '../../Service/Database/Supabase'; 
 import Chart from 'chart.js/auto'; 
-import Login from './Login';
-// Importa el Navigate si aún no lo has hecho, aunque solo se usa Login aquí.
+import Login from '../../Auth/Components/Login';
 
-// --- CSS del HTML original (SOLUCIÓN APLICADA: Eliminado el selector 'body') ---
 const DASHBOARD_STYLES = `
     /* Variables y Paleta de Colores (Moderno y Corporativo) */
     :root {
@@ -342,13 +340,12 @@ const CHART_COLORS_LIGHT = {
 };
 
 
-const Dashboard = () => {
+const DashboardPages = () => {
     // --- Referencias y Estados ---
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
     const [session, setSession] = useState(null);
     const [authLoading, setAuthLoading] = useState(true);
-   
     const [allClients, setAllClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
@@ -835,4 +832,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default DashboardPages;

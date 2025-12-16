@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../Supabase/Supabase'; 
-import Login from './Login';
+import { supabase } from '../../Service/Database/Supabase'; 
+import Login from '../../Auth/Components/Login';
 
 
 const getStyles = () => `
@@ -46,15 +46,7 @@ const getStyles = () => `
         cursor: pointer;
         transition: background-color 0.2s;
     }
-    #clientForm button:hover, #auth-form button:hover {
-        background-color: #2a4365;
-    }
-    #clientForm button[type="button"] { /* Botón Cancelar */
-        background-color: #a0aec0;
-    }
-    #clientForm button[type="button"]:hover {
-        background-color: #718096;
-    }
+   
 `;
 
 const initialFormState = {
@@ -67,7 +59,7 @@ const initialFormState = {
     estado: 'N/A',
 };
 
-const Clientes = () => {
+const ClientesPages = () => {
     // --- Estado de Autenticación ---
     const [session, setSession] = useState(null);
     const [authLoading, setAuthLoading] = useState(false);
@@ -344,4 +336,4 @@ const Clientes = () => {
     );
 };
 
-export default Clientes;
+export default ClientesPages;
