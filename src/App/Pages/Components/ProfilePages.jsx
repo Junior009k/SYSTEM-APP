@@ -1,283 +1,238 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../Service/Database/Supabase';
 
-// 1. CONFIGURACIÓN DE SUPABASE
-// Usando las credenciales proporcionadas anteriormente
-const SUPABASE_URL = 'https://uwafsywazersqpmalmqw.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV3YWZzeXdhemVyc3FwbWFsbXF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5MDg4MzMsImV4cCI6MjA3NzQ4NDgzM30.1FzR9yUoLyPrfO9ixX4uIYJhMZM7YbV-45uIz-CF2dw';
-const TABLE_NAME = 'profiles';
+const ProfilePages = () => {
+  // Estados para catálogos básicos
+  const [perfiles, setPerfiles] = useState([]);
+  const [funcionalidades, setFuncionalidades] = useState([]);
+  const [usuarios, setUsuarios] = useState([]);
+  
+  // Estados para los resúmenes (Tablas inferiores)
+  const [relacionUP, setRelacionUP] = useState([]);
+  const [relacionPF, setRelacionPF] = useState([]);
 
-// Inicialización del cliente Supabase (asumimos que la librería está disponible)
-// Usamos createClient ya que estamos en un entorno React/JSX
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  // Estados para formularios
+  const [nuevoPerfil, setNuevoPerfil] = useState({ nombre: '', descripcion: '' });
+  const [nuevaFunc, setNuevaFunc] = useState({ codigo: '', nombre_mostrar: '' });
+  const [vinculoUP, setVinculoUP] = useState({ usuario_id: '', perfil_id: '' });
+  const [vinculoPF, setVinculoPF] = useState({ perfil_id: '', funcionalidad_id: '' });
 
-const App = () => {
-    // 2. ESTADOS
-    const [loading, setLoading] = useState(true);
-    const [session, setSession] = useState(null);
-    const [profile, setProfile] = useState({ id: '', email: '', username: '', website: '' });
-    const [message, setMessage] = useState('');
-    const [isError, setIsError] = useState(false);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-    // Estado del formulario para los campos editables
-    const [formState, setFormState] = useState({ username: '', website: '' });
-    const [isSaving, setIsSaving] = useState(false);
+  const fetchData = async () => {
+    // Carga de catálogos básicos
+    const { data: p } = await supabase.from('perfiles').select('*');
+    const { data: f } = await supabase.from('funcionalidades').select('*');
+    const { data: u } = await supabase.from('profiles_public').select('*');
 
-    // 3. FUNCIONES DE UTILIDAD
-    const showMessage = useCallback((msg, error = false) => {
-        setMessage(msg);
-        setIsError(error);
-        setTimeout(() => setMessage(''), 5000);
-    }, []);
+    // Carga de relaciones para el resumen con joins
+    const { data: up } = await supabase
+      .from('usuario_perfiles')
+      .select('profiles_public(email), perfiles(nombre)');
+    
+    const { data: pf } = await supabase
+      .from('perfil_funcionalidades')
+      .select('perfiles(nombre), funcionalidades(nombre_mostrar)');
 
-    // 4. LÓGICA DE PERFIL (Supabase DB)
+    setPerfiles(p || []);
+    setFuncionalidades(f || []);
+    setUsuarios(u || []);
+    setRelacionUP(up || []);
+    setRelacionPF(pf || []);
+  };
 
-    /**
-     * Crea una entrada de perfil inicial si no existe para el usuario autenticado.
-     */
-    const createInitialProfile = useCallback(async (userId, email) => {
-        const initialUsername = email.split('@')[0] || 'usuario';
-        try {
-            const { error } = await supabase
-                .from(TABLE_NAME)
-                .insert({ id: userId, username: initialUsername });
-            
-            if (error) throw error;
-            showMessage('Perfil inicial creado. ¡Bienvenido!');
-            return { id: userId, email, username: initialUsername, website: '' };
+  const crearPerfil = async () => {
+    if (!nuevoPerfil.nombre) return alert("Nombre requerido");
+    await supabase.from('perfiles').insert([nuevoPerfil]);
+    setNuevoPerfil({ nombre: '', descripcion: '' });
+    fetchData();
+  };
 
-        } catch (error) {
-            showMessage(`Error al crear el perfil inicial: ${error.message}`, true);
-            console.error('Error al crear perfil inicial:', error);
-            return null;
-        }
-    }, [showMessage]);
+  const crearFuncionalidad = async () => {
+    if (!nuevaFunc.codigo) return alert("Código requerido");
+    await supabase.from('funcionalidades').insert([nuevaFunc]);
+    setNuevaFunc({ codigo: '', nombre_mostrar: '' });
+    fetchData();
+  };
 
-    /**
-     * Obtiene los datos del perfil de la tabla 'profiles'.
-     */
-    const fetchProfile = useCallback(async (userId, email) => {
-        try {
-            let { data, error, status } = await supabase
-                .from(TABLE_NAME)
-                .select(`username, website, id`)
-                .eq('id', userId)
-                .single();
+ const vincularUsuarioPerfil = async () => {
+  if (!vinculoUP.usuario_id || !vinculoUP.perfil_id) {
+    return alert("Complete los campos");
+  }
 
-            if (error && status !== 406) throw error;
+  // .upsert() detecta si el par usuario_id/perfil_id ya existe
+  const { error } = await supabase
+    .from('usuario_perfiles')
+    .upsert(vinculoUP, { 
+      onConflict: 'usuario_id' // O la columna que defina la unicidad
+    });
 
-            if (data) {
-                // Perfil encontrado
-                setProfile({ id: userId, email, username: data.username, website: data.website });
-                setFormState({ username: data.username, website: data.website });
-            } else {
-                // Perfil no encontrado, crear uno
-                const newProfile = await createInitialProfile(userId, email);
-                if (newProfile) {
-                     setProfile(newProfile);
-                     setFormState({ username: newProfile.username, website: newProfile.website });
-                }
-            }
-        } catch (error) {
-            showMessage(`Error al cargar el perfil: ${error.message}`, true);
-            console.error('Error al cargar perfil:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, [showMessage, createInitialProfile]);
-
-
-    /**
-     * Maneja el envío del formulario de actualización de perfil.
-     */
-    const handleProfileSubmit = async (e) => {
-        e.preventDefault();
-        if (!session) return;
-
-        setIsSaving(true);
-
-        try {
-            const updates = {
-                id: session.user.id,
-                username: formState.username.trim(),
-                website: formState.website.trim(),
-                updated_at: new Date().toISOString(),
-            };
-
-            const { error } = await supabase
-                .from(TABLE_NAME)
-                .upsert(updates, { onConflict: 'id' });
-
-            if (error) throw error;
-
-            // Actualizar el estado del perfil con los nuevos datos
-            setProfile(prev => ({ 
-                ...prev, 
-                username: updates.username, 
-                website: updates.website 
-            }));
-            showMessage('Perfil actualizado con éxito!');
-        } catch (error) {
-            showMessage(`Error al actualizar el perfil: ${error.message}`, true);
-            console.error('Error al actualizar perfil:', error);
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    /**
-     * Cierra la sesión del usuario.
-     */
-    const logout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            showMessage(`Error al cerrar sesión: ${error.message}`, true);
-        } else {
-            showMessage('Sesión cerrada correctamente.');
-        }
-    };
-
-    // 5. EFECTO PARA MANEJAR LA AUTENTICACIÓN
-    useEffect(() => {
-        const { data: listener } = supabase.auth.onAuthStateChange(
-            (event, currentSession) => {
-                console.log('Auth Event:', event, 'Session:', currentSession);
-                setSession(currentSession);
-                
-                if (currentSession) {
-                    const user = currentSession.user;
-                    // Solo cargamos el perfil si la sesión está activa y los datos de usuario están disponibles
-                    fetchProfile(user.id, user.email);
-                } else {
-                    setLoading(false);
-                }
-            }
-        );
-
-        // Limpiar el listener al desmontar el componente
-        return () => {
-            if (listener && listener.subscription) {
-                 listener.subscription.unsubscribe();
-            }
-        };
-    }, [fetchProfile]); // Dependencia de fetchProfile
-
-
-    // 6. VISTAS CONDICIONALES (RENDERIZADO)
-
-    /**
-     * Vista de carga.
-     */
-    const LoadingView = () => (
-        <div className="main-container text-center py-10">
-            <div className="animate-spin rounded-full h-8 w-8 border-4 border-indigo-500 border-t-transparent mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando estado de autenticación...</p>
-        </div>
-    );
-
-    /**
-     * Vista de acceso restringido.
-     */
-    const UnauthenticatedView = () => (
-        <div className="main-container text-center py-10">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">🚫 Perfil No Disponible</h2>
-            <p className="text-gray-600 mb-6">Debes iniciar sesión para administrar tu perfil.</p>
-            <p className="text-sm text-gray-500">Esta vista solo está disponible para usuarios autenticados de Supabase.</p>
-        </div>
-    );
-
-    /**
-     * Vista del formulario de perfil.
-     */
-    const ProfilePages = () => (
-        <div className="main-container">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">Administrar Perfil</h2>
-            
-            <div className="mb-4 p-3 bg-indigo-50 border-l-4 border-indigo-500 text-indigo-700 rounded-md">
-                <p className="font-medium">Email: <span className="font-normal">{profile.email}</span></p>
-                <p className="text-xs mt-1">Tu ID de Usuario (uid): <span className="break-all font-mono text-xs text-gray-500">{profile.id}</span></p>
-            </div>
-
-            <form onSubmit={handleProfileSubmit} className="space-y-4">
-                <div className="form-group">
-                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">Nombre de Usuario</label>
-                    <input 
-                        type="text" 
-                        id="username" 
-                        value={formState.username}
-                        onChange={(e) => setFormState({...formState, username: e.target.value})}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="website" className="block text-sm font-medium text-gray-700">Sitio Web (Opcional)</label>
-                    <input 
-                        type="url" 
-                        id="website" 
-                        value={formState.website}
-                        onChange={(e) => setFormState({...formState, website: e.target.value})}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                </div>
-                <button 
-                    type="submit" 
-                    disabled={isSaving}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition duration-150"
-                >
-                    {isSaving ? 'Guardando...' : 'Actualizar Perfil'}
-                </button>
-            </form>
-        </div>
-    );
-
-    // Renderizado principal
-    let content;
-    if (loading) {
-        content = <LoadingView />;
-    } else if (session) {
-        content = <ProfilePages />;
-    } else {
-        content = <UnauthenticatedView />;
-    }
-
-    // Estilo para el mensaje de estado
-    const messageClass = isError 
-        ? 'text-red-600 bg-red-100 border-red-500' 
-        : 'text-green-600 bg-green-100 border-green-500';
-
-    return (
-        <div className="p-4 md:p-8 min-h-screen">
-            <header className="mb-8 p-4 bg-indigo-600 rounded-lg shadow-xl">
-                <div className="flex justify-between items-center max-w-7xl mx-auto">
-                    <h1 className="text-3xl font-bold text-white">Administración de Perfiles</h1>
-                    <button 
-                        onClick={session ? logout : null} 
-                        disabled={loading || !session}
-                        className="bg-white text-indigo-600 hover:bg-indigo-100 font-semibold py-2 px-4 rounded-lg shadow transition duration-200 disabled:opacity-50"
-                    >
-                        {loading ? 'Cargando...' : session ? 'Cerrar Sesión' : 'Acceso Restringido'}
-                    </button>
-                </div>
-            </header>
-
-            <div className="max-w-7xl mx-auto">
-                <div id="view-container">
-                    {content}
-                </div>
-
-                {message && (
-                    <div className={`mt-4 mx-auto max-w-sm text-center p-3 border-l-4 rounded-md ${messageClass} transition duration-300`}>
-                        <p className="text-sm font-medium">{message}</p>
-                    </div>
-                )}
-
-                <div className="mt-8 pt-4 border-t border-gray-200 flex flex-wrap justify-center gap-4">
-                    <a href="index.html" className="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition duration-150">Ir a CRUD Clientes (Simulado)</a>
-                    <a href="index dashboard.html" className="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition duration-150">Ir a Dashboard (Simulado)</a>
-                </div>
-            </div>
-        </div>
-    );
+  if (error) {
+    console.error("Error al vincular:", error);
+    alert("Hubo un error al procesar la vinculación");
+  } else {
+    fetchData();
+    alert("Vinculación o actualización exitosa");
+  }
 };
 
-export default App;
+  const vincularPerfilFuncionalidad = async () => {
+    if (!vinculoPF.perfil_id || !vinculoPF.funcionalidad_id) return alert("Complete los campos");
+    await supabase.from('perfil_funcionalidades').insert([vinculoPF]);
+    fetchData();
+    alert("Funcionalidad asignada");
+  };
+
+  return (
+    <div className="profile-container">
+      <header className="profile-header">
+        <h1>Gestión de Seguridad</h1>
+        <p>Configura roles, funcionalidades y visualiza el resumen de accesos.</p>
+      </header>
+
+      <div className="profile-grid">
+        {/* PANEL 1: CREAR PERFIL */}
+        <section className="management-card">
+          <h2>Crear Perfil</h2>
+          <div className="input-group">
+            <label>Nombre del Rol</label>
+            <input 
+              className="profile-input" 
+              placeholder="Ej: Administrador" 
+              value={nuevoPerfil.nombre}
+              onChange={e => setNuevoPerfil({...nuevoPerfil, nombre: e.target.value})}
+            />
+          </div>
+          <div className="input-group">
+            <label>Descripción</label>
+            <textarea 
+              className="profile-textarea" 
+              placeholder="Descripción..."
+              value={nuevoPerfil.descripcion}
+              onChange={e => setNuevoPerfil({...nuevoPerfil, descripcion: e.target.value})}
+            />
+          </div>
+          <button onClick={crearPerfil} className="btn-action btn-blue">Guardar Perfil</button>
+        </section>
+
+        {/* PANEL 2: NUEVA FUNCIONALIDAD */}
+        <section className="management-card">
+          <h2>Nueva Funcionalidad</h2>
+          <div className="input-group">
+            <label>Código de Sistema</label>
+            <input 
+              className="profile-input" 
+              placeholder="Ej: user_delete" 
+              value={nuevaFunc.codigo}
+              onChange={e => setNuevaFunc({...nuevaFunc, codigo: e.target.value})}
+            />
+          </div>
+          <div className="input-group">
+            <label>Nombre en Pantalla</label>
+            <input 
+              className="profile-input" 
+              placeholder="Ej: Eliminar Usuarios"
+              value={nuevaFunc.nombre_mostrar}
+              onChange={e => setNuevaFunc({...nuevaFunc, nombre_mostrar: e.target.value})}
+            />
+          </div>
+          <button onClick={crearFuncionalidad} className="btn-action btn-green">Registrar Función</button>
+        </section>
+
+        {/* PANEL 3: ASIGNAR ROL A USUARIO */}
+        <section className="management-card">
+          <h2>Asignar Rol a Usuario</h2>
+          <div className="input-group">
+            <label>Seleccionar Usuario</label>
+            <select className="profile-select" onChange={e => setVinculoUP({...vinculoUP, usuario_id: e.target.value})}>
+              <option value="">-- Elige un usuario --</option>
+              {usuarios.map(u => (
+                <option key={u.id} value={u.id}>{u.email || u.id}</option>
+              ))}
+            </select>
+          </div>
+          <div className="input-group">
+            <label>Asignar Perfil</label>
+            <select className="profile-select" onChange={e => setVinculoUP({...vinculoUP, perfil_id: e.target.value})}>
+              <option value="">-- Elige un perfil --</option>
+              {perfiles.map(p => (
+                <option key={p.id} value={p.id}>{p.nombre}</option>
+              ))}
+            </select>
+          </div>
+          <button onClick={vincularUsuarioPerfil} className="btn-action btn-dark">Vincular Acceso</button>
+        </section>
+
+        {/* PANEL 4: PERMISOS POR PERFIL */}
+        <section className="management-card">
+          <h2>Permisos por Perfil</h2>
+          <div className="input-group">
+            <label>Perfil de Destino</label>
+            <select className="profile-select" onChange={e => setVinculoPF({...vinculoPF, perfil_id: e.target.value})}>
+              <option value="">-- Selecciona el perfil --</option>
+              {perfiles.map(p => (
+                <option key={p.id} value={p.id}>{p.nombre}</option>
+              ))}
+            </select>
+          </div>
+          <div className="input-group">
+            <label>Funcionalidad a Permitir</label>
+            <select className="profile-select" onChange={e => setVinculoPF({...vinculoPF, funcionalidad_id: e.target.value})}>
+              <option value="">-- Selecciona la función --</option>
+              {funcionalidades.map(f => (
+                <option key={f.id} value={f.id}>{f.nombre_mostrar}</option>
+              ))}
+            </select>
+          </div>
+          <button onClick={vincularPerfilFuncionalidad} className="btn-action btn-orange">Asignar Permiso</button>
+        </section>
+      </div>
+
+      <div className="summary-section">
+        <div className="management-card">
+          <h2>Usuarios / Roles</h2>
+          <table className="summary-table">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+              </tr>
+            </thead>
+            <tbody>
+              {relacionUP.map((item, i) => (
+                <tr key={i}>
+                  <td>{item.profiles_public?.email}</td>
+                  <td><span className="badge-role">{item.perfiles?.nombre}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="management-card">
+          <h2>Roles / Funcionalidades</h2>
+          <table className="summary-table">
+            <thead>
+              <tr>
+                <th>Rol</th>
+                <th>Funcionalidad</th>
+              </tr>
+            </thead>
+            <tbody>
+              {relacionPF.map((item, i) => (
+                <tr key={i}>
+                  <td><strong>{item.perfiles?.nombre}</strong></td>
+                  <td>{item.funcionalidades?.nombre_mostrar}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProfilePages;

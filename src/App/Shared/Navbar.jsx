@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { supabase } from '../Service/Database/Supabase'; // Ajusta la ruta a tu archivo Supabase
+import { useAuthPermissions } from '../Hooks/useAuth';
 
 // --- CSS DEL NAVBAR INYECTADO (Basado en la paleta de colores de Dashboard) ---
 const NAVBAR_STYLES = `
@@ -121,29 +122,49 @@ const NAVBAR_STYLES = `
 const menuItems = [
     { 
       path: "/Clientes", name: "Clientes", 
-      icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> 
+      requiredPermission: "1", // Código que definiste en 'funcionalidades'
+      icon:<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> 
+
     },
     { 
       path: "/Reportes", name: "Reportes", 
-      icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> 
+      requiredPermission: "2",
+      icon:  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg> 
+
     },
     { 
       path: "/Notificacion", name: "Notificaciones", 
-      icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> 
+      requiredPermission: "3",
+      icon:  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg> 
     },
     { 
       path: "/Caducidades", name: "Caducidades", 
-      icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 
+      requiredPermission: "4",
+      icon:  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> 
+
     },
     { 
       path: "/ClientesMigration", name: "Migración", 
-      icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v5"/><path d="M3 12v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/><path d="M9 12h6"/></svg> 
+      requiredPermission: "5",
+      icon:  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v5"/><path d="M3 12v5a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5"/><path d="M9 12h6"/></svg> 
+
     },
-];
+    { 
+      path: "/Perfil", name: "Seguridad", 
+      requiredPermission: "6",
+      icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+  <circle cx="12" cy="7" r="4"/>
+  <path d="M22 11l-2 2-2-2"/>
+</svg>
+
+    },
+  ];
 
 
 const Navbar = ({ onLogout, userEmail }) => {
     
+   const { permissions, loading } = useAuthPermissions();
     const handleLogout = onLogout || (async () => {
         await supabase.auth.signOut();
     });
@@ -167,21 +188,24 @@ const Navbar = ({ onLogout, userEmail }) => {
                     </div>
 
                     {/* ENLACES DE NAVEGACIÓN */}
-                    <div className="nav-links-group">
-                        {menuItems.map((item) => (
-                            <NavLink
-                                key={item.path}
-                                to={item.path}
-                                // Usa la clase base y añade 'active' si corresponde
-                                className={({ isActive }) => 
-                                    `nav-link ${isActive ? 'active' : ''}`
-                                }
-                            >
-                                {item.icon}
-                                {item.name}
-                            </NavLink>
-                        ))}
-                    </div>
+    <div className="nav-links-group">
+  {menuItems
+    /* Filtramos los items: solo se muestran si el código de la funcionalidad 
+       está dentro de los permisos del usuario */
+    .filter(item => permissions.includes(item.requiredPermission))
+    .map((item) => (
+      <NavLink
+        key={item.path}
+        to={item.path}
+        className={({ isActive }) => 
+          `nav-link ${isActive ? 'active' : ''}`
+        }
+      >
+        {item.icon}
+        {item.name}
+      </NavLink>
+    ))}
+</div>
 
                     {/* INFO DE USUARIO Y BOTÓN DE LOGOUT */}
                     <div className="nav-user-info">

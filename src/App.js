@@ -1,4 +1,5 @@
 import './App.css';
+import './ProfilePage.css'; // Importa el estilo nuevo
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { supabase } from './App/Service/Database/Supabase';
@@ -75,7 +76,7 @@ function App() {
             <Route path="/Notificacion" element={session ? <NotificationSettingPages /> : <Navigate to="/" />} />
             <Route path="/Caducidades" element={session ? <CaducidadesPages /> : <Navigate to="/" />} />
             <Route path="/ClientesMigration" element={session ? <ClientMigrationPages /> : <Navigate to="/" />} />
-             <Route path="/Profile" element={session ? <ProfilePages /> : <Navigate to="/" />} />
+             <Route path="/Perfil" element={session ? <ProfilePages /> : <Navigate to="/" />} />
           </Routes>
         </div>
       </main>
