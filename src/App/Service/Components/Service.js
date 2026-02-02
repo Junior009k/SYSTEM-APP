@@ -24,7 +24,7 @@ export const  updateClient=async (dataClient)=>{
     const { error } = await supabase
             .from(TABLE_NAME)
             .update(dataClient) 
-            .eq('id', id);
+            .eq('id', dataClient.id);
     return  { error }
 }
 

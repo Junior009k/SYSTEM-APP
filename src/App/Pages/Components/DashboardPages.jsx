@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../../Service/Database/Supabase'; 
 import Chart from 'chart.js/auto'; 
-import Login from '../../Auth/Components/Login';
+import { TableDashboard } from '../../../Components/TableDashboard';
 
 const DASHBOARD_STYLES = `
     /* Variables y Paleta de Colores (Moderno y Corporativo) */
@@ -344,8 +344,6 @@ const DashboardPages = () => {
     // --- Referencias y Estados ---
     const chartRef = useRef(null);
     const chartInstance = useRef(null);
-    const [session, setSession] = useState(null);
-    const [authLoading, setAuthLoading] = useState(true);
     const [allClients, setAllClients] = useState([]);
     const [filteredClients, setFilteredClients] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
@@ -356,28 +354,6 @@ const DashboardPages = () => {
         orderState: ''
     });
 
-    // --- Lógica de Autenticación ---
-
-    useEffect(() => {
-        // Inicializar la sesión y escuchar cambios
-        const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setSession(session);
-            setAuthLoading(false);
-        };
-
-        getSession();
-
-        // Escuchar cambios de estado de autenticación
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setSession(session);
-                setAuthLoading(false);
-            }
-        );
-
-        return () => subscription.unsubscribe();
-    }, []);
 
     // Función pura para procesar los datos brutos
     const processClientData = useCallback((clients) => {
@@ -453,14 +429,9 @@ const DashboardPages = () => {
         setDataLoading(false);
     }, [processClientData]);
 
-    // Cargar datos si hay sesión
     useEffect(() => {
-        if (session) {
-            loadClientData();
-        } else if (!authLoading) {
-            setDataLoading(false); // Si no hay sesión, no hay datos que cargar
-        }
-    }, [session, authLoading, loadClientData]);
+          loadClientData();
+     }, [loadClientData]);
 
 
     // --- Lógica de Filtros y Actualización del Dashboard ---
@@ -658,85 +629,9 @@ const DashboardPages = () => {
             );
         }
 
-        return (
-            <div className="table-container">
-                <table className="client-table">
-                    <thead>
-                        <tr>
-                            <th style={{ width: '5%' }}>ID</th>
-                            <th style={{ width: '20%' }}>Cliente</th>
-                            <th style={{ width: '10%' }}>Estado</th>
-                            <th style={{ width: '10%' }}>Estado Pedido</th>
-                            <th style={{ width: '15%' }}>Caducidad Actual</th>
-                            <th style={{ width: '15%' }}>Caducidad Pendiente</th>
-                            <th style={{ width: '10%' }}>Soporte</th>
-                            <th style={{ width: '5%' }}>Prioridad</th>
-                            <th style={{ width: '10%' }}>Días Restantes</th>
-                        </tr>
-                    </thead>
-                    <tbody id="client-list">
-                        {clients.map(client => {
-                            const dateDisplay = client.daysLeft < 0
-                                ? <span style={{ color: 'var(--status-red)', fontWeight: 500 }}>{client.expirationDate || 'N/A'}</span>
-                                : client.expirationDate || 'N/A';
-
-                            const newDateDisplay = client.newExpirationDate
-                                ? <span style={{ color: 'var(--status-pending)', fontWeight: 600 }}>{client.newExpirationDate}</span>
-                                : <span style={{ color: 'var(--color-text-medium)' }}>Pendiente</span>;
-
-                            let daysDisplay;
-                            if (client.statusText === 'Inactivo' || client.statusText === 'Pendiente') {
-                                daysDisplay = <span style={{ color: 'var(--color-text-medium)' }}>N/A</span>;
-                            } else if (client.daysLeft < 0) {
-                                daysDisplay = <span style={{ fontWeight: 700, color: 'var(--status-red)', fontSize: '0.8rem' }}>{Math.abs(client.daysLeft)} DÍAS CADUCADO</span>;
-                            } else if (client.daysLeft === 0) {
-                                daysDisplay = <span style={{ fontWeight: 700, color: 'var(--status-red)', fontSize: '0.8rem' }}>VENCE HOY</span>;
-                            } else {
-                                daysDisplay = <span style={{ fontWeight: 500, color: '#4B5563' }}>{client.daysLeft} días</span>;
-                            }
-
-                            const statusClass = `status-${client.statusText.toLowerCase().replace(' ', '')}`;
-                            const orderStatusClass = `order-${(client.orderState || 'vacio').toLowerCase().replace(' ', '')}`;
-                            const orderStateDisplay = (client.orderState || 'N/A').toUpperCase();
-
-                            return (
-                                <tr key={client.id}>
-                                    <td>{client.id}</td>
-                                    <td>{client.client}</td>
-                                    <td><span className={`status-badge ${statusClass}`}>{client.statusText}</span></td>
-                                    <td><span className={`order-badge ${orderStatusClass}`}>{orderStateDisplay}</span></td>
-                                    <td>{dateDisplay}</td>
-                                    <td>{newDateDisplay}</td>
-                                    <td>{client.support || 'N/A'}</td>
-                                    <td>{client.priority || 'N/A'}</td>
-                                    <td>{daysDisplay}</td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </table>
-            </div>
-        );
+        return (<TableDashboard clients={clients}/>);
     };
 
-    // --- Componente de Autenticación (Auth UI) ---
-
-    if (authLoading) {
-        return (
-            <div className="container" style={{ padding: '50px 0', textAlign: 'center' }}>
-                {/* Aún inyectamos los estilos aquí para que 'container' y 'h2' tengan formato */}
-                <style dangerouslySetInnerHTML={{ __html: DASHBOARD_STYLES }} /> 
-                <h2>Cargando autenticación...</h2>
-            </div>
-        );
-    }
-
-   if (!session) {
-        // Redirige al Login/Home, manejado por el Navigate en App.js
-        return (
-            <Login/>
-        );
-    }
 
 
     // --- Componente de Dashboard Principal (Logged-in UI) ---

@@ -1,41 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { supabase } from '../../Service/Database/Supabase'; 
 import {insertClient} from '../../Service/Components/Service'; 
-import Login from '../../Auth/Components/Login';
 
 
 const ClientMigrationPages = () => {
-    const [session, setSession] = useState(null);
-    const [authLoading, setAuthLoading] = useState(true);
     const [uploadStatus, setUploadStatus] = useState('');
     const [uploading, setUploading] = useState(false);
     const [isDragOver, setIsDragOver] = useState(false);
 
-    // --- Lógica de Autenticación ---
-
-    useEffect(() => {
-        const getSession = async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            setSession(session);
-            setAuthLoading(false);
-        };
-
-        getSession();
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (_event, session) => {
-                setSession(session);
-                setAuthLoading(false);
-            }
-        );
-
-        return () => subscription.unsubscribe();
-    }, []);
-
-
-    /**
-     * Función central para procesar el archivo y realizar la inserción masiva.
-     */
     const handleFileUpload = useCallback(async (file) => {
         if (file.type !== 'text/plain') {
             setUploadStatus('❌ Formato de archivo no válido. Por favor, sube un archivo .txt.');
@@ -48,7 +19,6 @@ const ClientMigrationPages = () => {
         const reader = new FileReader();
         reader.onload = async (e) => {
             const text = e.target.result;
-            // Dividir por líneas, limpiar espacios y filtrar líneas vacías
             const names = text.split('\n')
                 .map(name => name.trim())
                 .filter(name => name.length > 0);
@@ -87,7 +57,6 @@ const ClientMigrationPages = () => {
     }, []);
 
 
-    // --- Lógica Drag & Drop (React Events) ---
 
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -121,21 +90,6 @@ const ClientMigrationPages = () => {
         }
     };
 
-
-    // --- Componente de Autenticación (JSX) ---
-    if (authLoading) {
-        return (
-            <div style={{ textAlign: 'center', padding: '50px' }}>
-                Cargando autenticación...
-            </div>
-        );
-    }
-     if (!session) {
-        return (
-            <Login/>
-        );
-    }
-    // --- Componente Principal de Carga Masiva (JSX) ---
     return (
         <div>
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '600px', width: '100%', margin: '0 auto 20px auto', padding: '10px 0' }}>
