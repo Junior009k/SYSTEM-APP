@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../Service/Database/Supabase'; 
-import Login from '../../Auth/Components/Login';
+import Swal from "sweetalert2";
 import { TableNotification } from '../../../Components/TableNotification';
 import { FormNotification } from '../../../Components/FormNotification';
 
@@ -18,7 +18,6 @@ const NOTIFICATION_STYLES = `
     #clientForm {
         display: flex;
         flex-direction: column;
-        gap: 15px;
     }
     .form-group {
         display: flex;
@@ -174,21 +173,11 @@ const getMailConfig = (mailData) => {
 };
 
 const NotificationSettingPages = () => {
-    // --- Estado de Autenticación ---
-    const [session, setSession] = useState(null);
-    const [authLoading, setAuthLoading] = useState(true);
-    const [authEmail, setAuthEmail] = useState('');
-    const [authMessage, setAuthMessage] = useState('');
-
-    // --- Estado CRUD ---
     const [formData, setFormData] = useState(initialFormState);
     const [clients, setClients] = useState([]);
     const [crudLoading, setCrudLoading] = useState(true);
     const [crudMessage, setCrudMessage] = useState('Cargando clientes...');
-
-    // --- Lógica de Autenticación ---
-
-                
+      
     useEffect(() => {loadClientes();       }, []);
 
     /**
@@ -297,7 +286,7 @@ const NotificationSettingPages = () => {
         if (query) {
             fetchClient(query);
         } else {
-            alert('Ingrese un ID o Nombre para buscar o crear un nuevo cliente.');
+           Swal.fire({ title: 'No se ha encontrado el id', text: '', icon: 'warning', });
         }
     };
 
@@ -361,21 +350,20 @@ const NotificationSettingPages = () => {
                 .update(dataToSave)
                 .eq('id', id);
             error = response.error;
-            successMessage = `Cliente ${id} actualizado exitosamente.`;
+
+            Swal.fire({ title: 'Notificacion actualizada', text:  `Cliente ${id} actualizado exitosamente.`, icon: 'success', });
         } else {
             // Crear nuevo cliente
             const response = await supabase
                 .from(TABLE_NAME)
                 .insert(dataToSave);
             error = response.error;
-            successMessage = `Cliente "${nombreCliente}" creado exitosamente.`;
+            Swal.fire({ title: 'Notificacion actualizada', text:  `Cliente "${nombreCliente}" creado exitosamente.`, icon: 'error', });
         }
         
         if (error) {
             console.error('Error al guardar cliente:', error);
-            alert('Error al guardar: ' + error.message);
         } else {
-            alert(successMessage);
             resetForm();
             loadClientes();
         }

@@ -1,3 +1,4 @@
+import Swal from "sweetalert2";
 import  { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../Service/Database/Supabase'; 
 import { TableClientes } from '../../../Components/TableClientes';
@@ -5,27 +6,9 @@ import { FormClientes } from '../../../Components/FormClientes';
 const getStyles = () => `
     #crud-container {
         display: grid;
-        grid-template-columns: 300px 1fr;
-        gap: 30px;
+        grid-template-columns:250px 1fr;
+        gap: 20px;
         max-width: 1200px;
-        margin: 0 auto;
-    }
-    #clientForm, #auth-form {
-        background: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-    #clientForm div, #auth-form div {
-        display: flex;
-        flex-direction: column;
-    }
-    #clientForm label, #auth-form label {
-        margin-bottom: 5px;
-        font-weight: 600;
     }
     #clientForm input, 
     #clientForm select, 
@@ -36,13 +19,6 @@ const getStyles = () => `
         border-radius: 5px;
         border: 1px solid #ddd;
         font-size: 16px;
-    }
-    #clientForm button, #auth-form button {
-        background-color: #2c5282;
-        color: white;
-        border: none;
-        cursor: pointer;
-        transition: background-color 0.2s;
     }
 `;
 const initialFormState = {
@@ -120,7 +96,13 @@ const ClientesPages = () => {
 
     
     const deleteCliente = async (id, nombre) => {
-        if (window.confirm(`¿Estás seguro de que quieres eliminar a ${nombre}?`)) {
+        Swal.fire({
+      title: `¿Está seguro de Esto?, Esta acción es irreversible!`,
+      showCancelButton: true,
+      confirmButtonText: "Si",
+      }  ).then(async (result) => {
+        if (result.isConfirmed) {
+         
             const { error } = await supabase
                 .from('clientes')
                 .delete()
@@ -131,7 +113,8 @@ const ClientesPages = () => {
             } else {
                 loadClientes();
             }
-        }
+    }})
+        
     };
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -143,6 +126,7 @@ const ClientesPages = () => {
                 .eq('id', formData.id);
 
             if (error) console.error('Error actualizando cliente:', error);
+            Swal.fire({ title: 'Cliente Actualizado', text: '', icon: 'success', });
         } else {
             // Crear
             const { error } = await supabase
@@ -150,8 +134,9 @@ const ClientesPages = () => {
                 .insert(clienteData);
 
             if (error) console.error('Error creando cliente:', error);
+            Swal.fire({ title: 'Cliente Creado', text: '', icon: 'success', });
         }
-
+         
         resetForm();
         loadClientes(); // Recargar la tabla
     };

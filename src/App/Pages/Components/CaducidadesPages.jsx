@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {selectClient, updateClient} from '../../Service/Components/Service' 
 import { TableCaducidades } from '../../../Components/TableCaducidades';
 import { FormCaducidades } from '../../../Components/FormCaducidades';
+import Swal from "sweetalert2";
 
 const CADUCIDADES_STYLES = `
     /* Campos deshabilitados */
@@ -62,12 +63,12 @@ const CaducidadesPages = () => {
     const nuevaFechaIngresada = nueva_fecha_de_caducidad.trim();
     
     if (!id) {
-        alert('Por favor, selecciona un cliente de la lista primero.');
+        Swal.fire({ title: 'Selecciona un cliente', text:  'Por favor, selecciona un cliente de la lista primero.', icon: 'error', });
         return;
     }
 
     if (!nuevaFechaIngresada) {
-        alert('Debes ingresar un valor en "Nueva Fecha de Caducidad".');
+        Swal.fire({ title: 'Ingrese una Fecha', text:  'Debes ingresar un valor en "Nueva Fecha de Caducidad".', icon: 'error', });
         return;
     }
  setCrudLoading(true);
@@ -76,9 +77,10 @@ const CaducidadesPages = () => {
 
     if (error) {
         console.error('Error actualizando cliente:', error);
-        alert('Error al actualizar: ' + error.message);
+        Swal.fire({ title: 'Error al actualizar:', text:  '' + error.message, icon: 'error', });
+        alert();
     } else {
-        alert(`Nueva fecha de caducidad actualizada con éxito para el cliente ID ${id}.`);
+        Swal.fire({ title: 'Fecha actualizada', text:  `Nueva fecha de caducidad actualizada con éxito para el cliente ID ${id}.`, icon: 'success', });
         await loadClientes();
         resetForm();
     }

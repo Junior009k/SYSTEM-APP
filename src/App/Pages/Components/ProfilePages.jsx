@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../Service/Database/Supabase';
+import Swal from "sweetalert2";
 
 const ProfilePages = () => {
   // Estados para catálogos básicos
@@ -44,14 +45,14 @@ const ProfilePages = () => {
   };
 
   const crearPerfil = async () => {
-    if (!nuevoPerfil.nombre) return alert("Nombre requerido");
+    if (!nuevoPerfil.nombre) return  Swal.fire({ title: 'Nombre requerido', text:  '', icon: 'warning', });
     await supabase.from('perfiles').insert([nuevoPerfil]);
     setNuevoPerfil({ nombre: '', descripcion: '' });
     fetchData();
   };
 
   const crearFuncionalidad = async () => {
-    if (!nuevaFunc.codigo) return alert("Código requerido");
+    if (!nuevaFunc.codigo) return  Swal.fire({ title: 'Codigo requerido', text:  '', icon: 'warning', });
     await supabase.from('funcionalidades').insert([nuevaFunc]);
     setNuevaFunc({ codigo: '', nombre_mostrar: '' });
     fetchData();
@@ -59,7 +60,7 @@ const ProfilePages = () => {
 
  const vincularUsuarioPerfil = async () => {
   if (!vinculoUP.usuario_id || !vinculoUP.perfil_id) {
-    return alert("Complete los campos");
+    return Swal.fire({ title: 'Complete los campos', text:  '', icon: 'warning', });
   }
 
   // .upsert() detecta si el par usuario_id/perfil_id ya existe
@@ -71,18 +72,18 @@ const ProfilePages = () => {
 
   if (error) {
     console.error("Error al vincular:", error);
-    alert("Hubo un error al procesar la vinculación");
+    Swal.fire({ title: 'Hubo un error al procesar la vinculación', text:  '', icon: 'error', });
   } else {
     fetchData();
-    alert("Vinculación o actualización exitosa");
+    Swal.fire({ title: 'Vinculación o actualización exitosa', text:  '', icon: 'success', });
   }
 };
 
   const vincularPerfilFuncionalidad = async () => {
-    if (!vinculoPF.perfil_id || !vinculoPF.funcionalidad_id) return alert("Complete los campos");
+    if (!vinculoPF.perfil_id || !vinculoPF.funcionalidad_id) return  Swal.fire({ title: 'Complete los campos', text:  '', icon: 'warning', });
     await supabase.from('perfil_funcionalidades').insert([vinculoPF]);
     fetchData();
-    alert("Funcionalidad asignada");
+    Swal.fire({ title: "Funcionalidad asignada", text:  '', icon: 'success', });
   };
 
   return (

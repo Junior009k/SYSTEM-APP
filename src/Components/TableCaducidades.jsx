@@ -68,12 +68,12 @@ export const TableCaducidades = ({ clients, populateForm, crudLoading }) => {
             <table style={styles.table} id="clientTable">
                 <thead>
                     <tr style={styles.trHead}>
-                        <th style={styles.th} onClick={() => requestSort('id')}>ID {getSortIcon('id')}</th>
-                        <th style={styles.th} onClick={() => requestSort('nombre_de_cliente')}>Nombre {getSortIcon('nombre_de_cliente')}</th>
-                        <th style={styles.th} onClick={() => requestSort('fecha_de_caducidad')}>Caducidad {getSortIcon('fecha_de_caducidad')}</th>
-                        <th style={styles.th} onClick={() => requestSort('nueva_fecha_de_caducidad')}>Nueva Cad. {getSortIcon('nueva_fecha_de_caducidad')}</th>
-                        <th style={styles.th} onClick={() => requestSort('soporte')}>Soporte {getSortIcon('soporte')}</th>
-                        <th style={styles.th} onClick={() => requestSort('prioridad')}>Prioridad {getSortIcon('prioridad')}</th>
+                        <th style={styles.th} onClick={() => requestSort('id')}>ID{getSortIcon('id')}</th>
+                        <th style={styles.th} onClick={() => requestSort('nombre_de_cliente')}>Nombre{getSortIcon('nombre_de_cliente')}</th>
+                        <th style={styles.th} onClick={() => requestSort('fecha_de_caducidad')}>Caducidad{getSortIcon('fecha_de_caducidad')}</th>
+                        <th style={styles.th} onClick={() => requestSort('nueva_fecha_de_caducidad')}>NuevaCad.{getSortIcon('nueva_fecha_de_caducidad')}</th>
+                        <th style={styles.th} onClick={() => requestSort('soporte')}>Soporte{getSortIcon('soporte')}</th>
+                        <th style={styles.th} onClick={() => requestSort('prioridad')}>Prioridad{getSortIcon('prioridad')}</th>
                         <th style={styles.th}>Acciones</th>
                     </tr>
                 </thead>

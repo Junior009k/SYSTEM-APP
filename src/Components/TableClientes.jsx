@@ -66,13 +66,13 @@ export const TableClientes = ({ clientes, populateForm, deleteCliente }) => {
             <table style={styles.table} id="clientTable">
                 <thead>
                     <tr style={styles.trHead}>
-                        <th style={styles.th} onClick={() => requestSort('id')}>ID {getSortIcon('id')}</th>
+                        <th style={styles.th} onClick={() => requestSort('id')}>ID{getSortIcon('id')}</th>
                         <th style={styles.th} onClick={() => requestSort('nombre_de_cliente')}>Nombre {getSortIcon('nombre_de_cliente')}</th>
-                        <th style={styles.th} onClick={() => requestSort('fecha_de_caducidad')}>Caducidad {getSortIcon('fecha_de_caducidad')}</th>
-                        <th style={styles.th} onClick={() => requestSort('nueva_fecha_de_caducidad')}>Nueva Cad. {getSortIcon('nueva_fecha_de_caducidad')}</th>
-                        <th style={styles.th} onClick={() => requestSort('soporte')}>Soporte {getSortIcon('soporte')}</th>
-                        <th style={styles.th} onClick={() => requestSort('prioridad')}>Prioridad {getSortIcon('prioridad')}</th>
-                        <th style={styles.th} onClick={() => requestSort('state')}>Estado {getSortIcon('state')}</th>
+                        <th style={styles.th} onClick={() => requestSort('fecha_de_caducidad')}>Caducidad{getSortIcon('fecha_de_caducidad')}</th>
+                        <th style={styles.th} onClick={() => requestSort('nueva_fecha_de_caducidad')}>Nueva.Cad.{getSortIcon('nueva_fecha_de_caducidad')}</th>
+                        <th style={styles.th} onClick={() => requestSort('soporte')}>Soporte{getSortIcon('soporte')}</th>
+                        <th style={styles.th} onClick={() => requestSort('prioridad')}>Prioridad{getSortIcon('prioridad')}</th>
+                        <th style={styles.th} onClick={() => requestSort('state')}>Estado{getSortIcon('state')}</th>
                         <th style={styles.th}>Acciones</th>
                     </tr>
                 </thead>
@@ -157,7 +157,7 @@ const styles = {
     totalBadge: { background: '#f0f0f0', padding: '4px 10px', borderRadius: '12px', fontSize: '12px' },
     table: { width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' },
     th: { backgroundColor: '#f4f4f4', padding: '12px', textAlign: 'left', borderBottom: '2px solid #ddd', cursor: 'pointer', fontSize: '14px' },
-    td: { padding: '10px', borderBottom: '1px solid #eee', fontSize: '14px' },
+    td: { padding: '12px', borderBottom: '1px solid #eee', fontSize: '14px' },
     actionBtn: { padding: '5px 10px', cursor: 'pointer', borderRadius: '4px', border: 'none', color: 'white', fontSize: '12px' },
     paginationContainer: { display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px', gap: '8px' },
     pageBtn: { padding: '6px 12px', border: '1px solid #007bff', background: 'white', color: '#007bff', borderRadius: '4px', cursor: 'pointer' },

@@ -85,12 +85,12 @@ export const TableNotification = ({ clients, populateForm, getMailConfig }) => {
             <table style={styles.table} id="clientTable">
                 <thead>
                     <tr>
-                        <th style={styles.th} onClick={() => requestSort('id')}>ID {getSortIcon('id')}</th>
-                        <th style={styles.th} onClick={() => requestSort('nombre_de_cliente')}>Cliente {getSortIcon('nombre_de_cliente')}</th>
+                        <th style={styles.th} onClick={() => requestSort('id')}>ID{getSortIcon('id')}</th>
+                        <th style={styles.th} onClick={() => requestSort('nombre_de_cliente')}>Cliente{getSortIcon('nombre_de_cliente')}</th>
                         <th style={styles.th} onClick={() => requestSort('emailDestino')}>Correos {getSortIcon('emailDestino')}</th>
-                        <th style={styles.th} onClick={() => requestSort('habilitarNotificacion')}>Notif. {getSortIcon('habilitarNotificacion')}</th>
-                        <th style={styles.th} onClick={() => requestSort('umbralDias')}>Umbral {getSortIcon('umbralDias')}</th>
-                        <th style={styles.th} onClick={() => requestSort('frecuencia')}>Frecuencia {getSortIcon('frecuencia')}</th>
+                        <th style={styles.th} onClick={() => requestSort('habilitarNotificacion')}>Notif.{getSortIcon('habilitarNotificacion')}</th>
+                        <th style={styles.th} onClick={() => requestSort('umbralDias')}>Umbral{getSortIcon('umbralDias')}</th>
+                        <th style={styles.th} onClick={() => requestSort('frecuencia')}>Frecuencia{getSortIcon('frecuencia')}</th>
                         <th style={styles.th}>Plantilla</th>
                         <th style={styles.th}>Acciones</th>
                     </tr>

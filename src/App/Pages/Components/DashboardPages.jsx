@@ -4,41 +4,29 @@ import Chart from 'chart.js/auto';
 import { TableDashboard } from '../../../Components/TableDashboard';
 
 const DASHBOARD_STYLES = `
-    /* Variables y Paleta de Colores (Moderno y Corporativo) */
     :root {
         --color-corporate-blue: #1E40AF;
         --color-primary-bg: #F0F4F8; 
-        --color-card-bg: #FFFFFF;
         --color-focus-ring-blue: #3B82F6;
         --color-text-dark: #1F2937;
         --color-text-medium: #6B7280;
-
-        /* Colores de Estado (Semáforo) */
         --status-red: #DC2626;
         --status-yellow: #F59E0B;
         --status-green: #10B981;
         --status-gray: #6B7280;
-        --status-pending: #4F46E5; 
-        
-        /* Colores de Estado de Pedido */
+        --status-pending: ; 
         --order-pedido: #3B82F6;    
         --order-enviado: #059669;   
         --order-pendiente: #F59E0B; 
         --order-listo: #10B981;     
     }
-
-    .dashboard-wrapper-style { /* Clase genérica para aplicar fuentes si es necesario */
-        font-family: 'Inter', sans-serif;
-        color: var(--color-text-dark);
-        min-height: 100%;
+    .dashboard-wrapper-style { 
+        color: #1F2937;
         width: 100%;
     }
-
-
     .container {
         max-width: 1380px;
         margin: 0 auto;
-        padding: 1rem;
     }
 
     @media (min-width: 768px) {
@@ -49,7 +37,7 @@ const DASHBOARD_STYLES = `
 
     /* Encabezado */
     .header {
-        background-color: var(--color-card-bg);
+        background-color: #FFFFFF;
         border-bottom: 1px solid #E5E7EB;
         box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); 
         position: sticky;
@@ -64,30 +52,10 @@ const DASHBOARD_STYLES = `
     .header h1 {
         font-size: 1.875rem;
         font-weight: 800;
-        color: var(--color-corporate-blue);
+        color: #1E40AF;
         margin: 0;
     }
 
-    .user-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .logout-button {
-        background-color: var(--status-red);
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-    }
-    .logout-button:hover {
-        background-color: #C53030;
-    }
-
-    /* Secciones del Dashboard */
     .dashboard-title {
         font-size: 2.25rem; 
         font-weight: 700;
@@ -96,7 +64,6 @@ const DASHBOARD_STYLES = `
         margin-top: 1rem;
     }
 
-    /* Panel de Visualización (Métricas + Gráfico) */
     .viz-panel {
         display: grid;
         grid-template-columns: 1fr;
@@ -127,7 +94,6 @@ const DASHBOARD_STYLES = `
         color: #374151;
     }
     
-    /* Contenedor de Métricas */
     #summary-metrics {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -323,13 +289,12 @@ const DASHBOARD_STYLES = `
     }
 `;
 
-// Paleta de colores para el gráfico (Barra)
 const CHART_COLORS = {
-    'Vigente': 'var(--status-green)',
-    'Proximo': 'var(--status-yellow)',
-    'Caducado': 'var(--status-red)',
-    'Inactivo': 'var(--status-gray)',
-    'Pendiente': 'var(--status-pending)',
+    'Vigente': '#10B981',
+    'Proximo': '#F59E0B',
+    'Caducado': '#DC2626',
+    'Inactivo': '#6B7280',
+    'Pendiente': '#4F46E5',
 };
 const CHART_COLORS_LIGHT = {
     'Vigente': '#34D399',
@@ -535,7 +500,6 @@ const DashboardPages = () => {
         const caducados = clients.filter(c => c.statusText === 'Caducado').length;
         const pendientes = clients.filter(c => c.statusText === 'Pendiente').length;
         const inactivos = clients.filter(c => c.statusText === 'Inactivo').length;
-
         const metrics = [
             { title: 'Total Cartera', value: clients.length, icon: 'Total', color: 'var(--color-corporate-blue)', ringColor: 'var(--color-corporate-blue)' },
             { title: 'Vigentes', value: vigentes, icon: 'Vigentes', color: 'var(--status-green)', ringColor: 'var(--status-green)' },
@@ -628,13 +592,10 @@ const DashboardPages = () => {
                 </p>
             );
         }
-
         return (<TableDashboard clients={clients}/>);
     };
 
 
-
-    // --- Componente de Dashboard Principal (Logged-in UI) ---
 
     return (
         <div className="dashboard-wrapper-style">
